@@ -1,0 +1,6 @@
+TODO:
+  Write documentation that doesn't suck
+  Make it so that specs actually work
+  Integrate autospec functionality into specs for convenience
+  Refactor specs so that they are not fugly.
+  Find a more DM friendly way of doing the "leaves" method.
