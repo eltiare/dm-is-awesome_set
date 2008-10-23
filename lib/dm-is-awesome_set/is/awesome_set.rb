@@ -146,12 +146,17 @@ module DataMapper
           reload
         end
 
+        def level
+          # TODO make a level-property that is cached and intelligently adjusted when saving objects
+          ancestors.length
+        end
+
         # Gets the root of this node
         def root
           self.class.first(root_hash.merge(:lft.lt => lft, :rgt.gt => rgt))
         end
 
-        # Gets all the roots of this node
+        # Gets all the roots of this node's tree
         def roots
           self.class.all(root_hash.merge(:order => [:lft.asc]))
         end
@@ -168,7 +173,7 @@ module DataMapper
 
         # Gets all nodes that share the same parent node, except for this node
         def siblings
-          self.class.all(scope_and_parent_hash.merge(:order => [:lft.asc], :id.not => id))
+          self.class.all(scope_and_parent_hash.merge(:order => [:lft.asc], :lft.not => lft))
         end
 
         # Same as siblings, but returns this node as well
