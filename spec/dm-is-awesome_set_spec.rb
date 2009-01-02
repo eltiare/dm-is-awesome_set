@@ -1,20 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-class Category
-  include DataMapper::Resource
-
-  property :id, Serial
-  property :name, String
-  property :scope,    Integer
-  property :scope_2,  Integer
-
-  is :awesome_set, :scope => [:scope, :scope_2]
-
-  # convenience methods only for speccing.
-  def pos; [lft,rgt] end
-  def sco; {:scope => scope, :scope_2 => scope_2}; end
-end
-
 
 scope = {:scope => 1, :scope_2 => 2}
 scope2 = {:scope => 1, :scope_2 => 5}
@@ -22,6 +7,8 @@ scope2 = {:scope => 1, :scope_2 => 5}
 describe DataMapper::Is::AwesomeSet do
   before :each do
     Category.auto_migrate!
+    Discrim1.auto_migrate!
+    Discrim2.auto_migrate!
   end
 
   it "puts itself as the last root in the defined scope on initial save" do
@@ -245,6 +232,24 @@ describe DataMapper::Is::AwesomeSet do
 
     c6.pos.should eql([1,2])
 
+  end
+  
+  it "should get all rows in the database if the discrimator is not part of scope" do
+    c1 = CatD11.create(scope)
+    c2 = CatD11.create(scope)
+    c3 = CatD12.create(scope)
+    c4 = CatD12.create(scope)
+    CatD12.roots(scope).size.should eql(4)
+  end
+  
+  it "should get only the same object types if discriminator is part of scope" do
+    c1 = CatD21.create(scope)
+    c2 = CatD21.create(scope)
+    c3 = CatD22.create(scope2)
+    c4 = CatD22.create(scope2)
+    Discrim2.roots(scope.merge(:type => 'CatD21')).size.should eql(2)
+    Discrim2.roots(scope2.merge(:type => 'CatD22')).size.should eql(2)
+    
   end
 
 

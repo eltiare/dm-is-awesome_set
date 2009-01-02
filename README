@@ -5,3 +5,10 @@ Yes, finally!  A nested_set for Datamapper that actually works!  .... at least
 I _think_ it does. Please test this out and let me know at jnicoll@gnexp.com
 if you run into any problems.  This readme will eventually have examples.  Until
 then, check the RDoc's and you should be fine.
+
+A quick note about discriminators:
+
+This version enables scoping that can either include or ignore discriminators.
+If you wish to scope by a discriminator, please include that column name in
+the scope option. Otherwise this plugin will work with all rows regardless of
+the discriminator column.

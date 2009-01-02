@@ -43,14 +43,17 @@ module DataMapper
 
       module ClassMethods
         def set_options(options) #:nodoc:
-          @@ias_options = { :child_key => [:parent_id], :scope => [] }.merge(options)
+          @ias_options = { :child_key => [:parent_id], :scope => [] }.merge(options)
         end
 
-        def ias_options; @@ias_options; end #:nodoc:
+        def ias_options;  @ias_options || superclass.ias_options end #:nodoc:
 
-        def child_keys; @@ias_options[:child_key]; end
-        def scope_keys; @@ias_options[:scope]; end
-
+        def child_keys; ias_options[:child_key]; end
+        def scope_keys; ias_options[:scope]; end
+        def is_nested_set? #:nodoc:
+          true
+        end
+        
         # Checks to see if the hash or object contains a valid scope by checking attributes or keys
         def valid_scope?(hash)
           return true if hash.is_a?(self)
@@ -90,26 +93,35 @@ module DataMapper
         # Pass the scope or an object with scope to get the first root
         def root(scope = {})
           scope = extract_scope(scope)
-          first(scope.merge(root_hash.merge(:order => [:lft.asc])))
+          get_class.first(scope.merge(root_hash.merge(:order => [:lft.asc])))
         end
 
         # Same as @root, but gets all roots
         def roots(scope = {})
           scope = extract_scope(scope)
-          all(scope.merge(root_hash.merge(:order => [:lft.asc])))
+          get_class.all(scope.merge(root_hash.merge(:order => [:lft.asc])))
         end
 
         # Gets the full set with scope behavior like @root
         def full_set(scope = {})
           scope = extract_scope(scope)
-          all(scope.merge(:order => [:lft.asc]))
+          get_class.all(scope.merge(:order => [:lft.asc]))
         end
 
         # Retrieves all nodes that do not have children.
         # This needs to be refactored for more of a DM style, if possible.
         def leaves(scope = {})
           scope = extract_scope(scope)
-          all(scope.merge(:order => [:lft.asc], :conditions => ["`rgt` - `lft` = 1"]))
+          get_class.all(scope.merge(:order => [:lft.asc], :conditions => ["`rgt` - `lft` = 1"]))
+        end
+        
+        # Since DataMapper looks for all records in a table when using discriminators
+        # when using the parent model , we'll look for the earliest ancestor class
+        # that is a nested set.
+        def get_class #:nodoc:
+          klass = self
+          klass = klass.superclass while klass.superclass.respond_to?(:is_nested_set?) && klass.superclass.is_nested_set?
+          klass
         end
       end # mod ClassMethods
 
@@ -147,68 +159,67 @@ module DataMapper
         end
 
         def level
-          # TODO make a level-property that is cached and intelligently adjusted when saving objects
           ancestors.length
         end
 
         # Gets the root of this node
         def root
-          self.class.first(root_hash.merge(:lft.lt => lft, :rgt.gt => rgt))
+          get_class.first(root_hash.merge(:lft.lt => lft, :rgt.gt => rgt))
         end
 
         # Gets all the roots of this node's tree
         def roots
-          self.class.all(root_hash.merge(:order => [:lft.asc]))
+          get_class.all(root_hash.merge(:order => [:lft.asc]))
         end
 
         # Gets all ancestors of this node
         def ancestors
-          self.class.all(scope_hash.merge(:lft.lt => lft, :rgt.gt => rgt, :order => [:lft.asc]))
+          get_class.all(scope_hash.merge(:lft.lt => lft, :rgt.gt => rgt, :order => [:lft.asc]))
         end
 
         # Same as ancestors, but also including this node
         def self_and_ancestors
-          self.class.all(scope_hash.merge(:lft.lte => lft, :rgt.gte => rgt, :order => [:lft.asc]))
+          get_class.all(scope_hash.merge(:lft.lte => lft, :rgt.gte => rgt, :order => [:lft.asc]))
         end
 
         # Gets all nodes that share the same parent node, except for this node
         def siblings
-          self.class.all(scope_and_parent_hash.merge(:order => [:lft.asc], :lft.not => lft))
+          get_class.all(scope_and_parent_hash.merge(:order => [:lft.asc], :lft.not => lft))
         end
 
         # Same as siblings, but returns this node as well
         def self_and_siblings
-          self.class.all(scope_and_parent_hash.merge(:order => [:lft.asc]))
+          get_class.all(scope_and_parent_hash.merge(:order => [:lft.asc]))
         end
 
         # Returns next node with same parent, or nil
         def next_sibling
-          self.class.first(scope_and_parent_hash.merge(:lft.gt => rgt, :order => [:lft.asc]))
+          get_class.first(scope_and_parent_hash.merge(:lft.gt => rgt, :order => [:lft.asc]))
         end
 
         # Returns previous node with same parent, or nil
         def previous_sibling
-          self.class.first(scope_and_parent_hash.merge(:rgt.lt => lft, :order => [:rgt.desc]))
+          get_class.first(scope_and_parent_hash.merge(:rgt.lt => lft, :order => [:rgt.desc]))
         end
 
         # Returns the full set within this scope
         def full_set
-          self.class.all(scope_hash)
+          get_class.all(scope_hash)
         end
 
         # Gets all descendents of this node
         def descendents
-          self.class.all(scope_hash.merge(:lft.lt => rgt, :lft.gt => lft, :order => [:lft.asc]))
+          get_class.all(scope_hash.merge(:lft.lt => rgt, :lft.gt => lft, :order => [:lft.asc]))
         end
 
         # Same as descendents, but returns self as well
         def self_and_descendents
-          self.class.all(scope_hash.merge(:rgt.lte => rgt, :lft.gte => lft, :order => [:lft.asc]))
+          get_class.all(scope_hash.merge(:rgt.lte => rgt, :lft.gte => lft, :order => [:lft.asc]))
         end
 
         # Retrieves the nodes without any children.
         def leaves
-          self.class.leaves(self)
+          get_class.leaves(self)
         end
 
         def attributes_set(hash) #:nodoc:
@@ -225,7 +236,7 @@ module DataMapper
         # Returns the destroyed objects
         def destroy
           sads = self_and_descendents
-          hooks = self.class.const_get('INSTANCE_HOOKS')
+          hooks = get_class.const_get('INSTANCE_HOOKS')
           before_methods = hooks[:destroy][:before].map { |hash| hash[:name] }
           after_methods =  hooks[:destroy][:after].map  { |hash| hash[:name] }
           # Trigger all the before :destroy methods
@@ -255,18 +266,18 @@ module DataMapper
         end
 
         def adjust_gap!(*args) #:nodoc:
-          self.class.adjust_gap!(*args)
+          get_class.adjust_gap!(*args)
         end
 
         def get_finder_hash(*args)
           ret = {}
-          args.each { |arg| self.class.ias_options[arg].each { |s| ret[s] = send(s) } }
+          args.each { |arg| get_class.ias_options[arg].each { |s| ret[s] = send(s) } }
           ret
         end
 
         def root_hash
           ret = {}
-          self.class.child_keys.each { |ck| ret[ck] = nil }
+          get_class.child_keys.each { |ck| ret[ck] = nil }
           scope_hash.merge(ret)
         end
 
@@ -275,7 +286,7 @@ module DataMapper
         end
 
         def extract_scope(hash)
-          self.class.extract_scope(hash)
+          get_class.extract_scope(hash)
         end
 
         def scope_hash
@@ -288,14 +299,14 @@ module DataMapper
 
         def same_scope?(obj)
           case obj
-          when self.class  :  scope_hash == obj.send(:scope_hash)
+          when get_class  :  scope_hash == obj.send(:scope_hash)
           when Hash   :   scope_hash == obj
           when nil    :   true
           end
         end
 
         def valid_scope?(hash)
-          self.class.valid_scope?(hash)
+          get_class.valid_scope?(hash)
         end
 
         def move_without_saving(vector)
@@ -333,13 +344,13 @@ module DataMapper
           pos, adjust_at, p_obj = case action
           when :root
             new_scope = obj ? extract_scope(obj) : scope_hash
-            max = (self.class.max(:rgt, new_scope) || 0) + 1
+            max = (get_class.max(:rgt, new_scope) || 0) + 1
           when :into    :  [obj.rgt, obj.rgt - 1, obj]
           when :above   :  [obj.lft, obj.lft - 1, obj.parent]
           when :below   :  [obj.rgt + 1, obj.rgt, obj.parent]
           when :to
             pos = obj.to_i
-            p_obj = self.class.first(scope_hash.merge(:lft.lt => pos, :rgt.gt => pos, :order => [:lft.desc]))
+            p_obj = get_class.first(scope_hash.merge(:lft.lt => pos, :rgt.gt => pos, :order => [:lft.desc]))
             [pos, pos - 1, p_obj]
           else raise 'Invalid action sent to the method "move": ' + action.to_s
           end
@@ -347,7 +358,7 @@ module DataMapper
           old_scope = nil
           new_scope ||= extract_scope(p_obj) if p_obj
 
-          max ||= (self.class.max(:rgt, new_scope || scope_hash) || 0) + 1
+          max ||= (get_class.max(:rgt, new_scope || scope_hash) || 0) + 1
           if pos == 0 || pos > max
             raise "You cannot move a node outside of the bounds of the tree.  You passed: #{pos}. Acceptable numbers are 1 through #{max}"
           end
@@ -360,7 +371,7 @@ module DataMapper
           end
 
           # make a new hole and assign parent
-          adjust_gap!(self.class.full_set(new_scope || scope_hash) , adjust_at, this_gap + 1) if adjust_at
+          adjust_gap!(get_class.full_set(new_scope || scope_hash) , adjust_at, this_gap + 1) if adjust_at
           self.parent = p_obj
 
           # Do we need to move the node (already present in the tree), or just save the attributes?
@@ -384,7 +395,7 @@ module DataMapper
 
             # Close hole
             if old_scope
-              adjust_gap!(self.class.full_set(old_scope), old_lft, -(this_gap + 1))
+              adjust_gap!(get_class.full_set(old_scope), old_lft, -(this_gap + 1))
             else
               adjustment += 1 if parent == old_parent
               adjust_gap!(full_set, lft + adjustment, -(this_gap + 1))
@@ -395,6 +406,10 @@ module DataMapper
             attributes_set(p_obj.send(:scope_hash)) if p_obj
           end
 
+        end
+        
+        def get_class #:no_doc:
+          self.class.get_class
         end
       end # mod InstanceMethods
 
