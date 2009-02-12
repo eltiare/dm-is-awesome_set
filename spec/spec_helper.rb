@@ -5,6 +5,7 @@ require 'dm-is-awesome_set'
 # Needed for the discriminator
 gem 'dm-types', '>=0.9.7'
 require 'dm-types'
+require 'dm-validations'
 
 
 # classes/vars for tests
@@ -70,7 +71,7 @@ end
 
 
 # Set up database
-DataMapper.setup(:default, 'mysql://localhost/awesome_set_test')
+DataMapper.setup(:default, 'sqlite3://awesome_set_test.db')
 DataMapper.auto_migrate!
 
 
