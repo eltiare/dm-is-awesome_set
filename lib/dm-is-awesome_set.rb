@@ -1,5 +1,5 @@
 require 'pathname'
-['dm-core', 'dm-adjust', 'dm-aggregates'].each do |dm_var|
+['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations'].each do |dm_var|
   gem dm_var, '>=0.9.7'
   require dm_var
 end
