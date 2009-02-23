@@ -4,7 +4,7 @@ require 'rake/gempackagetask'
 spec = Gem::Specification.new do |s|
   s.rubyforge_project = 'merb'
   s.name = "dm-is-awesome_set"
-  s.version = "0.7.0"
+  s.version = "0.7.2"
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
