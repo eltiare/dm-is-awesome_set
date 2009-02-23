@@ -153,7 +153,7 @@ module DataMapper
         def move(vector)
           transaction do
             move_without_saving(vector)
-            save!
+            respond_to?(:save!) ? save! : save
           end
           reload
         end
@@ -229,7 +229,7 @@ module DataMapper
 
         def update!(hash) #:nodoc#
           attributes_set(hash)
-          save!
+          respond_to?(:save!) ? save! : save
         end
 
         # Destroys the current node and all children nodes, running their before and after hooks

@@ -6,9 +6,25 @@ I _think_ it does. Please test this out and let me know at jnicoll@gnexp.com
 if you run into any problems.  This readme will eventually have examples.  Until
 then, check the RDoc's and you should be fine.
 
+The latest versions of merb_datamapper by default use repository blocks which 
+also enable the Identity Map. This plugin relies on dm_adjust which does not 
+currently work with the Identity Map. Please add this line to your config/init.rb
+file in your Merb project:
+
+Merb::Plugins.config[:merb_datamapper][:use_repository_block] = false
+
+If you want to activate the IM, simply wrap code in a DataMapper repository block
+like so: 
+
+DataMapper.repository do
+ # Your code here
+end
+
 A quick note about discriminators:
 
 This version enables scoping that can either include or ignore discriminators.
 If you wish to scope by a discriminator, please include that column name in
 the scope option. Otherwise this plugin will work with all rows regardless of
 the discriminator column.
+
+
