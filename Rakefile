@@ -4,9 +4,9 @@ require 'rake/gempackagetask'
 GEM_NAME = 'dm-is-awesome_set'
 
 spec = Gem::Specification.new do |s|
-  s.rubyforge_project = 'merb'
+  s.rubyforge_project = GEM_NAME
   s.name = GEM_NAME
-  s.version = "0.7.1"
+  s.version = "0.7.2"
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
@@ -18,7 +18,6 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('dm-core', '>= 0.9.7')
   s.add_dependency('dm-adjust', '>= 0.9.7')
   s.add_dependency('dm-aggregates', '>= 0.9.7')
-  s.add_dependency('dm-validations', '>= 0.9.10')
   s.require_path = 'lib'
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec}/**/*")
 end
