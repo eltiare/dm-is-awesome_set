@@ -31,7 +31,7 @@ module DataMapper
         property :lft, Integer, :writer => :private, :index => true
         property :rgt, Integer, :writer => :private, :index => true
 
-        class_opts = {:class_name => self.name, :child_key => opts[:child_key], :order => [:lft.asc], :writer => :protected}
+        class_opts = {:model => self.name, :child_key => opts[:child_key], :order => [:lft.asc], :writer => :protected}
         belongs_to :parent,  class_opts
         has n,     :children, class_opts
 
