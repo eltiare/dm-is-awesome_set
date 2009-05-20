@@ -27,11 +27,13 @@ module DataMapper
 
         opts = set_options(options)
         [:child_key, :scope].each {|var| raise "#{var} must be an Array" unless opts[var].is_a?(Array)}
+        
+        property :parent_id, Integer, :writer => :protected
 
         property :lft, Integer, :writer => :private, :index => true
         property :rgt, Integer, :writer => :private, :index => true
 
-        class_opts = {:model => self.name, :child_key => opts[:child_key], :order => [:lft.asc], :writer => :protected}
+        class_opts = {:model => self.name, :child_key => opts[:child_key], :order => [:lft.asc] }
         belongs_to :parent,  class_opts
         has n,     :children, class_opts
 
