@@ -6,6 +6,10 @@ scope2 = {:scope => 1, :scope_2 => 5}
 
 describe DataMapper::Is::AwesomeSet do
   
+  before(:all) do
+    DataMapper.auto_migrate!
+  end
+  
   describe "without active DM Identity Map" do
   
     before :each do
