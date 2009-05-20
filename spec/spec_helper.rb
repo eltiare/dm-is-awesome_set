@@ -26,7 +26,7 @@ def setup_adapter(name, default_uri = nil)
   end
 end
 
-ENV['ADAPTER'] ||= 'sqlite3'
+ENV['ADAPTER'] ||= 'mysql'
 setup_adapter(:default)
 
 
