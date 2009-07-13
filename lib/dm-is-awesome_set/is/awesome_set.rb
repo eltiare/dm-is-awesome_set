@@ -37,7 +37,7 @@ module DataMapper
         belongs_to :parent,  class_opts
         has n,     :children, class_opts
 
-        before :save do
+        before :save_self do
           move_without_saving(:root) if lft.nil? #You don't want to use new_record? here.  Trust me, you don't.
         end
 
@@ -155,7 +155,7 @@ module DataMapper
         def move(vector)
           transaction do
             move_without_saving(vector)
-            respond_to?(:save!) ? save! : save
+            save!
           end
           reload
         end
@@ -227,11 +227,6 @@ module DataMapper
         def attributes_set(hash) #:nodoc:
           hash = hash || {}
           hash.each { |k,v| attribute_set(k,v) }
-        end
-
-        def update!(hash) #:nodoc#
-          attributes_set(hash)
-          respond_to?(:save!) ? save! : save
         end
 
         # Destroys the current node and all children nodes, running their before and after hooks
