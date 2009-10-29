@@ -28,7 +28,7 @@ module DataMapper
         opts = set_options(options)
         [:child_key, :scope].each {|var| raise "#{var} must be an Array" unless opts[var].is_a?(Array)}
         
-        property :parent_id, Integer, :writer => :protected
+        property :parent_id, Integer, :min => 0, :writer => :protected
 
         property :lft, Integer, :writer => :private, :index => true
         property :rgt, Integer, :writer => :private, :index => true
