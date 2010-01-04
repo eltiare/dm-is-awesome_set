@@ -213,12 +213,18 @@ module DataMapper
         def descendents
           get_class.all(scope_hash.merge(:rgt.lt => rgt, :lft.gt => lft, :order => [:lft.asc]))
         end
+        
 
         # Same as descendents, but returns self as well
         def self_and_descendents
           get_class.all(scope_hash.merge(:rgt.lte => rgt, :lft.gte => lft, :order => [:lft.asc]))
         end
-
+        
+        
+        # Fixed spelling for when English majors are peering over your shoulder 
+        def descendants; descendents; end
+        def self_and_descendants;  self_and_descendents; end
+        
         # Retrieves the nodes without any children.
         def leaves
           get_class.leaves(self)
