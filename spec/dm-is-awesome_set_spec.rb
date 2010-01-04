@@ -206,9 +206,28 @@ describe DataMapper::Is::AwesomeSet do
 
       c2.move(:into => c1)
       c3.move(:into => c2)
-      c3.ancestors.size.should eql(2)
+      c3.ancestors.should have(2).categories
+      c3.ancestors.should include(c2)
+      c3.ancestors.should include(c1)
+      c3.self_and_ancestors.should have(3).categories
+      c3.self_and_ancestors.first.should eql c1
+      c3.self_and_ancestors.should include(c3)
+      c3.self_and_ancestors.should include(c2)
+      c3.self_and_ancestors.should include(c1)
+      c3.self_and_ancestors.last.should eql c3
     end
-
+    
+    it "gets all descendents" do
+      c1 = Category.create(scope)
+      c2 = Category.create(scope)
+      c3 = Category.create(scope)
+      c2.move(:into => c1)
+      c3.move(:into => c2)
+      c1.reload
+      c1.descendents.size.should eql(2)
+      c1.self_and_descendents.size.should eql(3)
+    end
+    
     it "gets all siblings" do
       c1 = Category.create(scope)
       c2 = Category.create(scope)
@@ -230,9 +249,8 @@ describe DataMapper::Is::AwesomeSet do
 
       c1.move(:into => c4)
       [c1,c2,c3,c4,c5,c6].each { |c| c.reload }
-
       c1.sco.should eql(scope2)
-
+      
       c2.pos.should eql([1,2])
       c3.pos.should eql([3,4])
 
@@ -292,6 +310,12 @@ describe DataMapper::Is::AwesomeSet do
   
   describe "with active DM Identity Map" do
     
+    before :each do
+      Category.auto_migrate!
+      Discrim1.auto_migrate!
+      Discrim2.auto_migrate!
+    end
+      
     it "puts itself as the last root in the defined scope on initial save when using the identity map" do
       repository do
         c1 = Category.create(scope)
@@ -311,8 +335,11 @@ describe DataMapper::Is::AwesomeSet do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
+        c1.pos.should eql([1,2]) # Check to make sure our assumptions about
+        c2.pos.should eql([3,4]) # starting positions is correct 
+        c3.pos.should eql([5,6]) # (before each auto_migrate! was missing)
         c2.move(:into => c1)
-
+        
         [c1,c2,c3].each { |c| c.reload }
         c1.pos.should eql([1,4])
         c2.pos.should eql([2,3])

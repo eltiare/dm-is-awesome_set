@@ -211,7 +211,7 @@ module DataMapper
 
         # Gets all descendents of this node
         def descendents
-          get_class.all(scope_hash.merge(:lft.lt => rgt, :lft.gt => lft, :order => [:lft.asc]))
+          get_class.all(scope_hash.merge(:rgt.lt => rgt, :lft.gt => lft, :order => [:lft.asc]))
         end
 
         # Same as descendents, but returns self as well
@@ -376,13 +376,13 @@ module DataMapper
             # Move elements
             if same_scope?(new_scope)
               move_by = pos - (lft + adjustment)
-              full_set.all(:lft.gte => lft + adjustment, :rgt.lte => rgt + adjustment).adjust!(:lft => move_by, :rgt => move_by)
+              full_set.all(:lft.gte => lft + adjustment, :rgt.lte => rgt + adjustment).adjust!({:lft => move_by, :rgt => move_by}, true)
             else # Things have to be done a little differently if moving scope
               old_lft = lft
               move_by = pos - lft
               old_scope = extract_scope(self)
               sads = self_and_descendents
-              sads.adjust!(:lft => move_by, :rgt => move_by)
+              sads.adjust!({:lft => move_by, :rgt => move_by}, true)
               # Update the attributes to match how they are in the database now.
               # Be sure to do this between adjust! and setting the new scope
               attribute_set(:rgt, rgt + move_by)
@@ -402,7 +402,7 @@ module DataMapper
             attribute_set(:rgt, lft + this_gap)
             attributes_set(p_obj.send(:scope_hash)) if p_obj
           end
-
+          
         end
         
         def get_class #:no_doc:
