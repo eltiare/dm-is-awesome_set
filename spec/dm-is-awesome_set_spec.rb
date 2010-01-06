@@ -206,10 +206,10 @@ describe DataMapper::Is::AwesomeSet do
 
       c2.move(:into => c1)
       c3.move(:into => c2)
-      c3.ancestors.should have(2).categories
+      c3.ancestors.size.should eql(2)
       c3.ancestors.should include(c2)
       c3.ancestors.should include(c1)
-      c3.self_and_ancestors.should have(3).categories
+      c3.self_and_ancestors.size.should eql(3)
       c3.self_and_ancestors.first.should eql c1
       c3.self_and_ancestors.should include(c3)
       c3.self_and_ancestors.should include(c2)
@@ -217,15 +217,21 @@ describe DataMapper::Is::AwesomeSet do
       c3.self_and_ancestors.last.should eql c3
     end
     
-    it "gets all descendents" do
+    it "gets all descendants" do
       c1 = Category.create(scope)
       c2 = Category.create(scope)
       c3 = Category.create(scope)
       c2.move(:into => c1)
       c3.move(:into => c2)
       c1.reload
-      c1.descendents.size.should eql(2)
-      c1.self_and_descendents.size.should eql(3)
+      c1.descendants.size.should eql(2)
+      c1.self_and_descendants.size.should eql(3)
+      c1.descendants.should include(c2)
+      c1.descendants.should include(c3)
+      c1.descendants.should_not include(c1)
+      c1.self_and_descendants.should include(c1)
+      c1.self_and_descendants.should include(c2)
+      c1.self_and_descendants.should include(c3)
     end
     
     it "gets all siblings" do
@@ -335,15 +341,18 @@ describe DataMapper::Is::AwesomeSet do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
-        c1.pos.should eql([1,2]) # Check to make sure our assumptions about
-        c2.pos.should eql([3,4]) # starting positions is correct 
-        c3.pos.should eql([5,6]) # (before each auto_migrate! was missing)
-        c2.move(:into => c1)
+        c1.pos.should eql([1,2]) # Check to make sure our assumptions about starting
+        c2.pos.should eql([3,4]) # positions is correct (added after found 
+        c3.pos.should eql([5,6]) # the before(:each) auto_migrate! block was missing)
+        c2.parent.should be_nil
         
+        c2.move(:into => c1)
+        c2.parent.should eql c1
+        c3.parent.should_not eql c1
         [c1,c2,c3].each { |c| c.reload }
         c1.pos.should eql([1,4])
-        c2.pos.should eql([2,3])
         c3.pos.should eql([5,6])
+        c2.pos.should eql([2,3])
 
 
         c2.move(:into => c3)
@@ -516,10 +525,36 @@ describe DataMapper::Is::AwesomeSet do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
-
+        
+        c2.ancestors.should_not include(c1)
+        c2.move(:into => c1)
+        c2.ancestors.should include(c1)
+        c3.move(:into => c2)
+        c3.ancestors.should include(c2)
+        c3.ancestors.should include(c1)
+        c1.level.should eql(0)
+        c2.level.should eql(1)
+        c3.level.should eql(2)
+      end
+    end
+    
+    
+    it "gets all descendants when using identity map" do
+      repository do
+        c1 = Category.create(scope)
+        c2 = Category.create(scope)
+        c3 = Category.create(scope)
         c2.move(:into => c1)
         c3.move(:into => c2)
-        c3.ancestors.size.should eql(2)
+        c1.reload
+        c1.descendants.size.should eql(2)
+        c1.self_and_descendants.size.should eql(3)
+        c1.descendants.should include(c2)
+        c1.descendants.should include(c3)
+        c1.descendants.should_not include(c1)
+        c1.self_and_descendants.should include(c1)
+        c1.self_and_descendants.should include(c2)
+        c1.self_and_descendants.should include(c3)
       end
     end
     

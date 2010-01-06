@@ -238,7 +238,7 @@ module DataMapper
         # Destroys the current node and all children nodes, running their before and after hooks
         # Returns the destroyed objects
         def destroy
-          sads = self_and_descendents
+          sads = self_and_descendants
           hooks = get_class.const_get('INSTANCE_HOOKS')
           before_methods = hooks[:destroy][:before].map { |hash| hash[:name] }
           after_methods =  hooks[:destroy][:after].map  { |hash| hash[:name] }
@@ -255,7 +255,7 @@ module DataMapper
 
         # Same as @destroy, but does not run the hooks
         def destroy!
-          sad = self_and_descendents
+          sad = self_and_descendants
           transaction do
             sad.dup.destroy!
             adjust_gap!(full_set, lft, -(rgt - lft + 1))
@@ -374,26 +374,29 @@ module DataMapper
           end
 
           # make a new hole and assign parent
+          # 
+          # Note: with identity map on an already saved object, making a hole
+          # will alter lft & rgt values immediately, so we need to keep copies
+          old_lft, old_rgt = lft, rgt if lft && rgt
           adjust_gap!(get_class.full_set(new_scope || scope_hash) , adjust_at, this_gap + 1) if adjust_at
-          self.parent = p_obj
-
+          
           # Do we need to move the node (already present in the tree), or just save the attributes?
-          if lft && (pos != lft || !same_scope?(new_scope))
+          if lft && (pos != old_lft || !same_scope?(new_scope))
             # Move elements
             if same_scope?(new_scope)
-              move_by = pos - (lft + adjustment)
-              full_set.all(:lft.gte => lft + adjustment, :rgt.lte => rgt + adjustment).adjust!({:lft => move_by, :rgt => move_by}, true)
+              move_by = pos - (old_lft + adjustment)
+              full_set.all(:lft.gte => old_lft + adjustment, :rgt.lte => old_rgt + adjustment).adjust!({:lft => move_by, :rgt => move_by}, true)
             else # Things have to be done a little differently if moving scope
-              old_lft = lft
-              move_by = pos - lft
+              move_by = pos - old_lft
               old_scope = extract_scope(self)
-              sads = self_and_descendents
+              sads = self_and_descendants
               sads.adjust!({:lft => move_by, :rgt => move_by}, true)
               # Update the attributes to match how they are in the database now.
               # Be sure to do this between adjust! and setting the new scope
-              attribute_set(:rgt, rgt + move_by)
-              attribute_set(:lft, lft + move_by)
-              sads.each { |sad| sad.update!(new_scope) }
+              attribute_set(:rgt, old_rgt + move_by)
+              attribute_set(:lft, old_lft + move_by)
+              
+              sads.each { |d| d.update!(new_scope)} 
             end
 
             # Close hole
@@ -401,13 +404,16 @@ module DataMapper
               adjust_gap!(get_class.full_set(old_scope), old_lft, -(this_gap + 1))
             else
               adjustment += 1 if parent == old_parent
-              adjust_gap!(full_set, lft + adjustment, -(this_gap + 1))
+              adjust_gap!(full_set, old_lft + adjustment, -(this_gap + 1))
             end
           else # just save the attributes
             attribute_set(:lft, pos)
             attribute_set(:rgt, lft + this_gap)
             attributes_set(p_obj.send(:scope_hash)) if p_obj
           end
+          # We set parent here because we don't want to throw errors with dirty
+          # tracking during all of the adjust! and update!(scope) calls
+          self.parent = p_obj
           
         end
         
