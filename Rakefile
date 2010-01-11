@@ -6,6 +6,8 @@ begin
   gem 'jeweler', '>= 1.4'
   require 'jeweler'
 
+  FileList['tasks/**/*.rake'].each { |task| load task }
+
   Jeweler::Tasks.new do |gem|
 
     gem.name        = "dm-is-awesome_set"
@@ -15,9 +17,9 @@ begin
     gem.homepage    = "http://github.com/snusnu/dm-is-awesome_set"
     gem.authors     = ["Jeremy Nicoll", "David Haslem", "Martin Gamsjaeger (snusnu)"]
 
-    gem.add_dependency 'dm-core',       '~> 0.10'
-    gem.add_dependency 'dm-adjust',     '~> 0.10'
-    gem.add_dependency 'dm-aggregates', '~> 0.10'
+    gem.add_dependency 'dm-core',           '~> 0.10'
+    gem.add_dependency 'dm-adjust',         '~> 0.10'
+    gem.add_dependency 'dm-aggregates',     '~> 0.10'
 
     gem.add_development_dependency 'rspec', '~> 1.2.9'
 
