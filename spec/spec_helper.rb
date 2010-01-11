@@ -1,11 +1,14 @@
 require 'rubygems'
-$:.push File.join(File.dirname(__FILE__), '..', 'lib')
-require 'dm-is-awesome_set'
 
-# Needed for the discriminator
-gem 'dm-types', '>=0.9.7'
+require 'dm-core'
+require 'dm-adjust'
+require 'dm-aggregates'
 require 'dm-types'
 require 'dm-validations'
+
+$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
+require 'dm-is-awesome_set'
+
 
 ENV["SQLITE3_SPEC_URI"]  ||= 'sqlite3::memory:'
 ENV["MYSQL_SPEC_URI"]    ||= 'mysql://localhost/dm-is_awesome_set_test'
