@@ -1,44 +1,33 @@
 require 'rubygems'
-require 'rake/gempackagetask'
+require 'rake'
 
-GEM_NAME = 'dm-is-awesome_set'
+begin
 
-spec = Gem::Specification.new do |s|
-  s.rubyforge_project = GEM_NAME
-  s.name = GEM_NAME
-  s.version = "0.10.0"
-  s.platform = Gem::Platform::RUBY
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
-  s.summary = "DataMapper nested set plugin that works"
-  s.description = s.summary
-  s.author = "Jeremy Nicoll"
-  s.email = "jnicoll@gnexp.com"
-  s.homepage = "http://gnexp.com/"
-  s.add_dependency('dm-core',       '>= 0.10.0')
-  s.add_dependency('dm-adjust',     '>= 0.10.0')
-  s.add_dependency('dm-aggregates', '>= 0.10.0')
-  s.require_path = 'lib'
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec}/**/*")
-end
+  gem 'jeweler', '>= 1.4'
+  require 'jeweler'
 
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
-end
+  Jeweler::Tasks.new do |gem|
 
-desc "install the plugin as a gem"
-task :install => [:package] do
-  sh %{sudo gem install pkg/#{spec.name}-#{spec.version}}
-end
+    gem.name        = "dm-is-awesome_set"
+    gem.summary     = %Q{A nested set plugin for datamapper}
+    gem.description = %Q{A library that lets any datamapper model act like a nested set}
+    gem.email       = "jnicoll@gnexp.com"
+    gem.homepage    = "http://github.com/snusnu/dm-is-awesome_set"
+    gem.authors     = ["Jeremy Nicoll", "David Haslem", "Martin Gamsjaeger (snusnu)"]
 
-desc "Uninstall the gem"
-task :uninstall do
-  sh %{sudo gem uninstall #{spec.name} --version #{spec.version}}
-end
+    gem.add_dependency 'dm-core',       '~> 0.10'
+    gem.add_dependency 'dm-adjust',     '~> 0.10'
+    gem.add_dependency 'dm-aggregates', '~> 0.10'
 
-desc "Create a gemspec file"
-task :gemspec do
-  File.open("#{GEM_NAME}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
+    gem.add_development_dependency 'rspec', '~> 1.2.9'
+
   end
+
+  Jeweler::GemcutterTasks.new
+
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
+
+task :spec => :check_dependencies
+task :default => :spec
