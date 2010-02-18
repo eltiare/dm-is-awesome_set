@@ -302,9 +302,9 @@ module DataMapper
 
         def same_scope?(obj)
           case obj
-          when get_class  :  scope_hash == obj.send(:scope_hash)
-          when Hash   :   scope_hash == obj
-          when nil    :   true
+          when get_class  then  scope_hash == obj.send(:scope_hash)
+          when Hash   then   scope_hash == obj
+          when nil    then   true
           end
         end
 
@@ -327,12 +327,12 @@ module DataMapper
 
           # Convenience methods
           ret_value = case action
-          when :higher :  previous_sibling ? move_without_saving(:above => previous_sibling) : false
-          when :highest : move_without_saving(:to => parent ? (parent.lft + 1) : 1)
-          when :lower : next_sibling ? move_without_saving(:below => next_sibling) : false
-          when :lowest : parent ? move_without_saving(:to => parent.rgt - 1) : move_without_saving(:root)
-          when :indent : previous_sibling ? move_without_saving(:into => previous_sibling) : false
-          when :outdent : parent ? move_without_saving(:below => parent) : false
+          when :higher then  previous_sibling ? move_without_saving(:above => previous_sibling) : false
+          when :highest then move_without_saving(:to => parent ? (parent.lft + 1) : 1)
+          when :lower then next_sibling ? move_without_saving(:below => next_sibling) : false
+          when :lowest then parent ? move_without_saving(:to => parent.rgt - 1) : move_without_saving(:root)
+          when :indent then previous_sibling ? move_without_saving(:into => previous_sibling) : false
+          when :outdent then parent ? move_without_saving(:below => parent) : false
           else :no_action
           end
           return ret_value unless ret_value == :no_action
@@ -348,9 +348,9 @@ module DataMapper
           when :root
             new_scope = obj ? extract_scope(obj) : scope_hash
             max = (get_class.max(:rgt, new_scope) || 0) + 1
-          when :into    :  [obj.rgt, obj.rgt - 1, obj]
-          when :above   :  [obj.lft, obj.lft - 1, obj.parent]
-          when :below   :  [obj.rgt + 1, obj.rgt, obj.parent]
+          when :into    then  [obj.rgt, obj.rgt - 1, obj]
+          when :above   then  [obj.lft, obj.lft - 1, obj.parent]
+          when :below   then  [obj.rgt + 1, obj.rgt, obj.parent]
           when :to
             pos = obj.to_i
             p_obj = get_class.first(scope_hash.merge(:lft.lt => pos, :rgt.gt => pos, :order => [:lft.desc]))
