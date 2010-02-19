@@ -1,3 +1,7 @@
+['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations'].each do |dm_var|
+  require dm_var
+end
+
 module DataMapper
   module Is
     ##
