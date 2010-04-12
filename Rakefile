@@ -1,9 +1,7 @@
-require 'rubygems'
 require 'rake'
 
 begin
 
-  gem 'jeweler', '>= 1.4'
   require 'jeweler'
 
   FileList['tasks/**/*.rake'].each { |task| load task }
@@ -31,5 +29,4 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
-task :spec => :check_dependencies
 task :default => :spec

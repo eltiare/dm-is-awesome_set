@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jeremy Nicoll", "David Haslem", "Martin Gamsjaeger (snusnu)"]
-  s.date = %q{2010-02-17}
+  s.date = %q{2010-04-12}
   s.description = %q{A library that lets any datamapper model act like a nested set}
   s.email = %q{jnicoll@gnexp.com}
   s.extra_rdoc_files = [
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".gitignore",
+     "Gemfile",
      "LICENSE",
      "README",
      "Rakefile",
@@ -40,7 +41,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/snusnu/dm-is-awesome_set}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{A nested set plugin for datamapper}
   s.test_files = [
     "spec/dm-is-awesome_set_spec.rb",
