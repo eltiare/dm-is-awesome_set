@@ -218,12 +218,26 @@ module DataMapper
           get_class.all(scope_hash.merge(:rgt.lt => rgt, :lft.gt => lft, :order => [:lft.asc]))
         end
 
-
         # Same as descendents, but returns self as well
         def self_and_descendents
           get_class.all(scope_hash.merge(:rgt.lte => rgt, :lft.gte => lft, :order => [:lft.asc]))
         end
 
+        def descendant?(ancestor)
+          ancestor.lft < lft && ancestor.rgt > rgt
+        end
+
+        def self_or_descendant?(ancestor)
+          ancestor.lft <= lft && ancestor.rgt >= rgt
+        end
+
+        def ancestor?(descendant)
+          descendant.lft > lft && descendant.rgt < rgt
+        end
+
+        def self_orancestor?(descendant)
+          descendant.lft >= lft && descendant.rgt <= rgt
+        end
 
         # Fixed spelling for when English majors are peering over your shoulder
         def descendants; descendents; end
