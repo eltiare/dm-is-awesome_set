@@ -3,6 +3,7 @@ source 'http://rubygems.org'
 gem 'activesupport',       '~> 3.0.0.beta3', :git => 'git://github.com/rails/rails.git', :require => 'active_support'
 
 gem 'dm-core',             '~> 0.10.3',      :git => 'git://github.com/datamapper/dm-core.git'
+gem 'dm-transactions',     '~> 0.10.3',      :git => 'git://github.com/datamapper/dm-transactions.git'
 gem 'dm-migrations',       '~> 0.10.3',      :git => 'git://github.com/datamapper/dm-migrations.git'
 gem 'dm-types',            '~> 0.10.3',      :git => 'git://github.com/datamapper/dm-types.git'
 gem 'dm-validations',      '~> 0.10.3',      :git => 'git://github.com/datamapper/dm-validations.git'
