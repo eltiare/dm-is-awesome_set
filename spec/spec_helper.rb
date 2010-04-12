@@ -1,6 +1,7 @@
 require 'rubygems'
 
 require 'dm-core'
+require 'dm-migrations'
 require 'dm-adjust'
 require 'dm-aggregates'
 require 'dm-types'
