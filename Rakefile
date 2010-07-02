@@ -18,7 +18,6 @@ begin
     gem.add_dependency 'dm-core',           '~> 0.10'
     gem.add_dependency 'dm-adjust',         '~> 0.10'
     gem.add_dependency 'dm-aggregates',     '~> 0.10'
-    gem.add_dependency 'dm-transactions',     '~> 0.10'
 
     gem.add_development_dependency 'rspec', '~> 1.2.9'
 
