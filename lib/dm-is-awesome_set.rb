@@ -78,7 +78,14 @@ module DataMapper
           check_scope(hash)
           ret = {}
           send_to_obj = hash.is_a?(self)
-          scope_keys.each { |sk| ret[sk] = send_to_obj ? hash.attribute_get(sk) : hash[sk] }
+          
+          scope_keys.each do |sk| 
+            if send_to_obj && self.public_method_defined?(name = sk)
+              ret[sk] = hash.__send__(sk)
+            else
+              ret[sk] = hash[sk] 
+            end
+          end
           ret
         end
 
@@ -250,7 +257,7 @@ module DataMapper
 
         def attributes_set(hash) #:nodoc:
           hash = hash || {}
-          hash.each { |k,v| attribute_set(k,v) }
+          self.attributes = hash
         end
 
         # Destroys the current node and all children nodes, running their before and after hooks
