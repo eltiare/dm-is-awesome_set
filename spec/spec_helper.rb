@@ -6,6 +6,7 @@ require 'dm-adjust'
 require 'dm-aggregates'
 require 'dm-types'
 require 'dm-validations'
+require 'dm-transactions'
 
 $LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
 require 'dm-is-awesome_set'
