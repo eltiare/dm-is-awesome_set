@@ -94,6 +94,26 @@ end
 class CatD22 < Discrim2
 end
 
+class FileServer
+  include DataMapper::Resource
+
+  property :id,       Serial
+  property :name,     String
+end
+
+class FileServerItem
+  include DataMapper::Resource
+
+  property :id,       Serial
+  property :name,     String
+  belongs_to :file_server
+  is :awesome_set, :scope => [:file_server]
+  # convenience methods only for speccing.
+  def pos; [lft,rgt] end
+  def sco; {:file_server => file_server}; end
+  
+end
+
 # Quick hack for ruby 1.8.6 - really, it's a hack. Don't use this anywhere else.
 
 class Hash
