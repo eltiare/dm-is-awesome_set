@@ -392,7 +392,7 @@ describe DataMapper::Is::AwesomeSet do
       # or a hash that represents that scope
       f5.move(:root => server1)
       [f1,f2,f3,f4,f5,f6].each { |c| c.reload }
-      f5.sco.should eql(scope)
+      f5.sco.should eql(server1)
 
       f2.pos.should eql([1,6])
       f4.pos.should eql([2,5])
@@ -809,7 +809,7 @@ describe DataMapper::Is::AwesomeSet do
         # or a hash that represents that scope
         f5.move(:root => server1)
         [f1,f2,f3,f4,f5,f6].each { |c| c.reload }
-        f5.sco.should eql(scope)
+        f5.sco.should eql(server1)
 
         f2.pos.should eql([1,6])
         f4.pos.should eql([2,5])
