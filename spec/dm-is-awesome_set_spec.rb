@@ -358,9 +358,9 @@ describe DataMapper::Is::AwesomeSet do
       
       s2 = FileServer.create({:name => 'bar'})
       server2 = {:file_server => s2}
-      f4 = FileServerItem.create({:file_server => s1})
-      f5 = FileServerItem.create({:file_server => s1})
-      f6 = FileServerItem.create({:file_server => s1})
+      f4 = FileServerItem.create({:file_server => s2})
+      f5 = FileServerItem.create({:file_server => s2})
+      f6 = FileServerItem.create({:file_server => s2})
       
       f1.move(:into => f4)
       [f1,f2,f3,f4,f5,f6].each { |c| c.reload }
@@ -775,9 +775,9 @@ describe DataMapper::Is::AwesomeSet do
     
         s2 = FileServer.create({:name => 'bar'})
         server2 = {:file_server => s2}
-        f4 = FileServerItem.create({:file_server => s1})
-        f5 = FileServerItem.create({:file_server => s1})
-        f6 = FileServerItem.create({:file_server => s1})
+        f4 = FileServerItem.create({:file_server => s2})
+        f5 = FileServerItem.create({:file_server => s2})
+        f6 = FileServerItem.create({:file_server => s2})
     
         f1.move(:into => f4)
         [f1,f2,f3,f4,f5,f6].each { |c| c.reload }
