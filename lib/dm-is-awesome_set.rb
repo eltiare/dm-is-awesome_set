@@ -1,4 +1,4 @@
-['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations'].each do |dm_var|
+['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations', 'dm-transactions'].each do |dm_var|
   require dm_var
 end
 
@@ -28,7 +28,7 @@ module DataMapper
       def is_awesome_set(options={})
         extend  DataMapper::Is::AwesomeSet::ClassMethods
         include DataMapper::Is::AwesomeSet::InstanceMethods
-
+        
         opts = set_options(options)
         [:child_key, :scope].each {|var| raise "#{var} must be an Array" unless opts[var].is_a?(Array)}
 
