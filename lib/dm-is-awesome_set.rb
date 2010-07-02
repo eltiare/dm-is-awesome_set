@@ -242,7 +242,7 @@ module DataMapper
           descendant.lft > lft && descendant.rgt < rgt
         end
 
-        def self_orancestor?(descendant)
+        def self_or_ancestor?(descendant)
           descendant.lft >= lft && descendant.rgt <= rgt
         end
 
