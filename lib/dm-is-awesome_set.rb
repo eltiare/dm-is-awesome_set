@@ -1,4 +1,4 @@
-['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations'].each do |dm_var|
+['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations', 'dm-transactions'].each do |dm_var|
   require dm_var
 end
 
