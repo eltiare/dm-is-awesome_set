@@ -1,4 +1,4 @@
-['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations', 'dm-transactions'].each do |dm_var|
+['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-transactions'].each do |dm_var|
   require dm_var
 end
 
@@ -41,7 +41,7 @@ module DataMapper
         belongs_to :parent,  class_opts
         has n,     :children, class_opts
 
-        before :save_self do
+        before :save do
           move_without_saving(:root) if lft.nil? #You don't want to use new_record? here.  Trust me, you don't.
         end
 
