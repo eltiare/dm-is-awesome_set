@@ -29,7 +29,7 @@ module DataMapper
       def is_awesome_set(options={})
         extend  DataMapper::Is::AwesomeSet::ClassMethods
         include DataMapper::Is::AwesomeSet::InstanceMethods
-        
+
         opts = set_options(options)
         [:child_key, :scope].each {|var| raise "#{var} must be an Array" unless opts[var].is_a?(Array)}
 
@@ -79,12 +79,12 @@ module DataMapper
           check_scope(hash)
           ret = {}
           send_to_obj = hash.is_a?(self)
-          
-          scope_keys.each do |sk| 
+
+          scope_keys.each do |sk|
             if send_to_obj && self.public_method_defined?(name = sk)
               ret[sk] = hash.__send__(sk)
             else
-              ret[sk] = hash[sk] 
+              ret[sk] = hash[sk]
             end
           end
           ret

@@ -59,7 +59,7 @@ class Discrim1
   property :scope,    Integer
   property :scope_2,  Integer
   property :type,     Discriminator
-  
+
   is :awesome_set, :scope => [:scope, :scope_2]
 
   # convenience methods only for speccing.
@@ -81,7 +81,7 @@ class Discrim2
   property :scope,    Integer
   property :scope_2,  Integer
   property :type,     Discriminator
-  
+
   is :awesome_set, :scope => [:scope, :scope_2, :type]
 
   # convenience methods only for speccing.
@@ -112,7 +112,7 @@ class FileServerItem
   # convenience methods only for speccing.
   def pos; [lft,rgt] end
   def sco; {:file_server => file_server}; end
-  
+
 end
 
 # Quick hack for ruby 1.8.6 - really, it's a hack. Don't use this anywhere else.
