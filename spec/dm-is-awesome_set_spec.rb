@@ -432,7 +432,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "puts itself as the last root in the defined scope on initial save when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c1.pos.should eql([1,2])
@@ -446,7 +446,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "moves itself into a parent when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -484,7 +484,7 @@ describe DataMapper::Is::AwesomeSet do
 
 
     it "moves itself into a parent with relationship scope update when using the identity map" do
-      repository do
+      DataMapper.repository do
         s1 = FileServer.create({:name => 'foo'})
         f1 = FileServerItem.create({:file_server => s1})
         f2 = FileServerItem.new
@@ -496,7 +496,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "moves around properly when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -543,7 +543,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "puts in proper places for above and below with scope when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -576,7 +576,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "puts in proper places for above and below without scope when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create
         c2 = Category.create
         c3 = Category.create
@@ -609,7 +609,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "gets the parent when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c2.move(:into => c1)
@@ -619,7 +619,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "identifies the root when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -633,7 +633,7 @@ describe DataMapper::Is::AwesomeSet do
 
     it "identifies the root with relationship scopes when using the identity map" do
       # Root with relationship scope
-      repository do
+      DataMapper.repository do
         s1 = FileServer.create({:name => 'foo'})
         f1 = FileServerItem.create({:file_server => s1})
         f2 = FileServerItem.create({:file_server => s1})
@@ -648,7 +648,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "gets all roots in the current scope when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c2.roots.size.should eql(2)
@@ -660,7 +660,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "gets all ancestors when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -679,7 +679,7 @@ describe DataMapper::Is::AwesomeSet do
 
 
     it "gets all descendants when using identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -698,7 +698,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "gets all siblings when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -710,7 +710,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "moves scope properly when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = Category.create(scope)
         c2 = Category.create(scope)
         c3 = Category.create(scope)
@@ -764,7 +764,7 @@ describe DataMapper::Is::AwesomeSet do
 
 
     it "moves scope properly with relationships when using the identity map" do
-      repository do
+      DataMapper.repository do
         # Relationship scope tests
         s1 = FileServer.create({:name => 'foo'})
         server1 = {:file_server => s1}
@@ -821,7 +821,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "should get all rows in the database if the discrimator is not part of scope when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = CatD11.create(scope)
         c2 = CatD11.create(scope)
         c3 = CatD12.create(scope)
@@ -831,7 +831,7 @@ describe DataMapper::Is::AwesomeSet do
     end
 
     it "should get only the same object types if discriminator is part of scope when using the identity map" do
-      repository do
+      DataMapper.repository do
         c1 = CatD21.create(scope)
         c2 = CatD21.create(scope)
         c3 = CatD22.create(scope2)
