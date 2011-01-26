@@ -1,6 +1,7 @@
-['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-transactions'].each do |dm_var|
-  require dm_var
-end
+require 'dm-core'
+require 'dm-adjust'
+require 'dm-aggregates'
+require 'dm-transactions'
 
 module DataMapper
   module Is
