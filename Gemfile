@@ -5,7 +5,6 @@ gem 'activesupport',       '~> 3.0.0', :require => nil
 gem 'dm-core',             :git => 'git://github.com/datamapper/dm-core.git'
 gem 'dm-transactions',     :git => 'git://github.com/datamapper/dm-transactions.git'
 gem 'dm-migrations',       :git => 'git://github.com/datamapper/dm-migrations.git'
-gem 'dm-types',            :git => 'git://github.com/datamapper/dm-types.git'
 gem 'dm-validations',      :git => 'git://github.com/datamapper/dm-validations.git'
 gem 'dm-adjust',           :git => 'git://github.com/datamapper/dm-adjust.git'
 gem 'dm-aggregates',       :git => 'git://github.com/datamapper/dm-aggregates.git'
