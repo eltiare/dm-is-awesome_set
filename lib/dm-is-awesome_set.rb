@@ -448,7 +448,7 @@ module DataMapper
         end
       end # mod InstanceMethods
 
-      Model.send(:include, self)
+      Model.append_extensions(self)
     end # mod AwesomeSet
   end # mod Is
 end # mod DM
