@@ -1,19 +1,93 @@
+require 'pathname'
+
 source 'http://rubygems.org'
 
-gem 'activesupport',       '~> 3.0.0', :require => nil
+SOURCE         = ENV.fetch('SOURCE', :git).to_sym
+REPO_POSTFIX   = SOURCE == :path ? ''                                : '.git'
+DATAMAPPER     = SOURCE == :path ? Pathname(__FILE__).dirname.parent : 'https://github.com/datamapper'
+SNUSNU         = SOURCE == :path ? Pathname(__FILE__).dirname.parent : 'https://github.com/snusnu'
+DM_VERSION     = '~> 1.2.0'
+DO_VERSION     = '~> 0.10.6'
+DM_DO_ADAPTERS = %w[ sqlite postgres mysql oracle sqlserver ]
+CURRENT_BRANCH = ENV.fetch('GIT_BRANCH', 'master')
 
-gem 'dm-core',             :git => 'git://github.com/datamapper/dm-core.git'
-gem 'dm-transactions',     :git => 'git://github.com/datamapper/dm-transactions.git'
-gem 'dm-migrations',       :git => 'git://github.com/datamapper/dm-migrations.git'
-gem 'dm-validations',      :git => 'git://github.com/datamapper/dm-validations.git'
-gem 'dm-adjust',           :git => 'git://github.com/datamapper/dm-adjust.git'
-gem 'dm-aggregates',       :git => 'git://github.com/datamapper/dm-aggregates.git'
+gem 'dm-core', DM_VERSION,
+  SOURCE  => "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}",
+  :branch => CURRENT_BRANCH
 
-gem 'dm-do-adapter',       :git => 'git://github.com/datamapper/dm-do-adapter.git'
-gem 'dm-sqlite-adapter',   :git => 'git://github.com/datamapper/dm-sqlite-adapter.git'
-gem 'dm-mysql-adapter',    :git => 'git://github.com/datamapper/dm-mysql-adapter.git'
-gem 'dm-postgres-adapter', :git => 'git://github.com/datamapper/dm-postgres-adapter.git'
+gem 'dm-validations', DM_VERSION,
+  SOURCE  => "#{DATAMAPPER}/dm-validations#{REPO_POSTFIX}",
+  :branch => CURRENT_BRANCH
 
-gem 'rake',                '~> 0.8.7'
-gem 'jeweler',             '~> 1.4'
-gem 'rspec',               '~> 1.3'
+gem 'dm-adjust', DM_VERSION,
+  SOURCE  => "#{DATAMAPPER}/dm-adjust#{REPO_POSTFIX}",
+  :branch => CURRENT_BRANCH
+
+gem 'dm-aggregates', DM_VERSION,
+  SOURCE  => "#{DATAMAPPER}/dm-aggregates#{REPO_POSTFIX}",
+  :branch => CURRENT_BRANCH
+
+gem 'dm-transactions', DM_VERSION,
+  SOURCE  => "#{DATAMAPPER}/dm-transactions#{REPO_POSTFIX}",
+  :branch => CURRENT_BRANCH
+
+group :development do
+
+  gem 'rake',           '~> 0.9.2'
+  gem 'rspec',          '~> 1.3.2'
+  gem 'yard',           '~> 0.7.2'
+  gem 'jeweler',        '~> 1.6.4'
+
+  gem 'dm-constraints', DM_VERSION,
+    SOURCE  => "#{DATAMAPPER}/dm-constraints#{REPO_POSTFIX}",
+    :branch => CURRENT_BRANCH
+
+end
+
+platforms :mri_18 do
+  group :quality do
+
+    gem 'rcov',      '~> 0.9.10'
+    gem 'yard',      '~> 0.7.2'
+    gem 'yardstick', '~> 0.4'
+
+  end
+end
+
+group :datamapper do
+
+  adapters = ENV['ADAPTER'] || ENV['ADAPTERS']
+  adapters = adapters.to_s.tr(',', ' ').split.uniq - %w[ in_memory ]
+
+  if (do_adapters = DM_DO_ADAPTERS & adapters).any?
+    do_options = {}
+    do_options[:git] = "#{DATAMAPPER}/do#{REPO_POSTFIX}" if ENV['DO_GIT'] == 'true'
+
+    gem 'data_objects', DO_VERSION, do_options.dup
+
+    do_adapters.each do |adapter|
+      adapter = 'sqlite3' if adapter == 'sqlite'
+      gem "do_#{adapter}", DO_VERSION, do_options.dup
+    end
+
+    gem 'dm-do-adapter', DM_VERSION,
+      SOURCE  => "#{DATAMAPPER}/dm-do-adapter#{REPO_POSTFIX}",
+      :branch => CURRENT_BRANCH
+  end
+
+  adapters.each do |adapter|
+    gem "dm-#{adapter}-adapter", DM_VERSION,
+      SOURCE  => "#{DATAMAPPER}/dm-#{adapter}-adapter#{REPO_POSTFIX}",
+      :branch => CURRENT_BRANCH
+  end
+
+  plugins = ENV['PLUGINS'] || ENV['PLUGIN']
+  plugins = plugins.to_s.tr(',', ' ').split.push('dm-migrations').uniq
+
+  plugins.each do |plugin|
+    gem plugin, DM_VERSION,
+      SOURCE  => "#{DATAMAPPER}/#{plugin}#{REPO_POSTFIX}",
+      :branch => CURRENT_BRANCH
+  end
+
+end
