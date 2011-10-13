@@ -841,6 +841,12 @@ describe DataMapper::Is::AwesomeSet do
       end
     end
 
+    it "destroys objects as intended" do
+      c1 = Category.create
+
+      expect{c1.destroy}.to_not raise_error(NoMethodError)
+    end
+
   end
 
 
