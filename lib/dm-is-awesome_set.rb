@@ -265,7 +265,7 @@ module DataMapper
         # Returns the destroyed objects
         def destroy
           sads = self_and_descendants
-          hooks = get_class.const_get('INSTANCE_HOOKS')
+          hooks = get_class.hooks
           before_methods = hooks[:destroy][:before].map { |hash| hash[:name] }
           after_methods =  hooks[:destroy][:after].map  { |hash| hash[:name] }
           # Trigger all the before :destroy methods
