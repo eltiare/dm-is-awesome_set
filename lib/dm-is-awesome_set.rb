@@ -40,7 +40,7 @@ module DataMapper
 
         class_opts = {:model => self.name, :child_key => opts[:child_key], :order => [:lft.asc] }
 
-        belongs_to :parent,   class_opts.merge!(:required => false)
+        belongs_to :parent,   class_opts.merge(:required => false)
         has n,     :children, class_opts
 
         before :save do
