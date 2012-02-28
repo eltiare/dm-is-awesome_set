@@ -419,6 +419,12 @@ describe DataMapper::Is::AwesomeSet do
       Discrim2.roots(scope2.merge(:type => 'CatD22')).size.should eql(2)
     end
 
+    it "should not accept manipulations by using the parent setter directly" do
+      c1 = Category.create(scope)
+      c2 = Category.create(scope)
+      lambda {c2.parent = c1}.should raise_error(NoMethodError)
+    end
+
   end
 
   describe "with active DM Identity Map" do
