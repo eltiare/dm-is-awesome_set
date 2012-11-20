@@ -1,6 +1,7 @@
-['dm-core', 'dm-adjust', 'dm-aggregates', 'dm-validations'].each do |dm_var|
-  require dm_var
-end
+require 'dm-core'
+require 'dm-adjust'
+require 'dm-aggregates'
+require 'dm-transactions'
 
 module DataMapper
   module Is
@@ -38,10 +39,12 @@ module DataMapper
         property :rgt, Integer, :writer => :private, :index => true
 
         class_opts = {:model => self.name, :child_key => opts[:child_key], :order => [:lft.asc] }
-        belongs_to :parent,  class_opts
+
+        belongs_to :parent,   class_opts.merge(:required => false)
+        protected  :parent=
         has n,     :children, class_opts
 
-        before :save_self do
+        before :save do
           move_without_saving(:root) if lft.nil? #You don't want to use new_record? here.  Trust me, you don't.
         end
 
@@ -78,7 +81,14 @@ module DataMapper
           check_scope(hash)
           ret = {}
           send_to_obj = hash.is_a?(self)
-          scope_keys.each { |sk| ret[sk] = send_to_obj ? hash.attribute_get(sk) : hash[sk] }
+
+          scope_keys.each do |sk|
+            if send_to_obj && self.public_method_defined?(name = sk)
+              ret[sk] = hash.__send__(sk)
+            else
+              ret[sk] = hash[sk]
+            end
+          end
           ret
         end
 
@@ -235,7 +245,7 @@ module DataMapper
           descendant.lft > lft && descendant.rgt < rgt
         end
 
-        def self_orancestor?(descendant)
+        def self_or_ancestor?(descendant)
           descendant.lft >= lft && descendant.rgt <= rgt
         end
 
@@ -250,14 +260,14 @@ module DataMapper
 
         def attributes_set(hash) #:nodoc:
           hash = hash || {}
-          hash.each { |k,v| attribute_set(k,v) }
+          self.attributes = hash
         end
 
         # Destroys the current node and all children nodes, running their before and after hooks
         # Returns the destroyed objects
         def destroy
           sads = self_and_descendants
-          hooks = get_class.const_get('INSTANCE_HOOKS')
+          hooks = get_class.hooks
           before_methods = hooks[:destroy][:before].map { |hash| hash[:name] }
           after_methods =  hooks[:destroy][:after].map  { |hash| hash[:name] }
           # Trigger all the before :destroy methods
@@ -440,7 +450,7 @@ module DataMapper
         end
       end # mod InstanceMethods
 
-      Model.send(:include, self)
+      Model.append_extensions(self)
     end # mod AwesomeSet
   end # mod Is
 end # mod DM

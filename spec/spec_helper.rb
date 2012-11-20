@@ -1,38 +1,10 @@
-require 'rubygems'
-
-require 'dm-core'
-require 'dm-migrations'
-require 'dm-adjust'
-require 'dm-aggregates'
-require 'dm-types'
-require 'dm-validations'
-
-$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
 require 'dm-is-awesome_set'
 
+require 'dm-core/spec/setup'
+DataMapper::Spec.setup
 
-ENV["SQLITE3_SPEC_URI"]  ||= 'sqlite3::memory:'
-ENV["MYSQL_SPEC_URI"]    ||= 'mysql://localhost/dm-is_awesome_set_test'
-ENV["POSTGRES_SPEC_URI"] ||= 'postgres://postgres@localhost/dm-is_awesome_set_test'
-
-
-def setup_adapter(name, default_uri = nil)
-  begin
-    DataMapper.setup(name, ENV["#{ENV['ADAPTER'].to_s.upcase}_SPEC_URI"] || default_uri)
-    Object.const_set('ADAPTER', ENV['ADAPTER'].to_sym) if name.to_s == ENV['ADAPTER']
-    true
-  rescue Exception => e
-    if name.to_s == ENV['ADAPTER']
-      Object.const_set('ADAPTER', nil)
-      warn "Could not load do_#{name}: #{e}"
-    end
-    false
-  end
-end
-
-ENV['ADAPTER'] ||= 'sqlite3'
-setup_adapter(:default)
-
+require 'dm-migrations'
+require 'dm-validations'
 
 # classes/vars for tests
 class Category
@@ -58,7 +30,7 @@ class Discrim1
   property :scope,    Integer
   property :scope_2,  Integer
   property :type,     Discriminator
-  
+
   is :awesome_set, :scope => [:scope, :scope_2]
 
   # convenience methods only for speccing.
@@ -80,7 +52,7 @@ class Discrim2
   property :scope,    Integer
   property :scope_2,  Integer
   property :type,     Discriminator
-  
+
   is :awesome_set, :scope => [:scope, :scope_2, :type]
 
   # convenience methods only for speccing.
@@ -92,6 +64,26 @@ class CatD21 < Discrim2
 end
 
 class CatD22 < Discrim2
+end
+
+class FileServer
+  include DataMapper::Resource
+
+  property :id,       Serial
+  property :name,     String
+end
+
+class FileServerItem
+  include DataMapper::Resource
+
+  property :id,       Serial
+  property :name,     String
+  belongs_to :file_server
+  is :awesome_set, :scope => [:file_server]
+  # convenience methods only for speccing.
+  def pos; [lft,rgt] end
+  def sco; {:file_server => file_server}; end
+
 end
 
 # Quick hack for ruby 1.8.6 - really, it's a hack. Don't use this anywhere else.
